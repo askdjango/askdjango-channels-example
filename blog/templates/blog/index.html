@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.4/css/bootstrap.min.css" />
+<style>
+#message_list {
+    margin-top: 20px;
+    padding: 0;
+}
+#message_list li {
+    list-style: none;
+}
+</style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Django Channels Example for #{{ request.path }}</h4>
+                    </div>
+                    <div class="card-block">
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <input type="text" name="message" id="message" class="form-control" autocomplete="off" />
+                            </div>
+                            {% comment %}
+                            <div class="col-sm-2">
+                                <button type="submit" class="btn btn-primary btn-block">Send</button>
+                            </div>
+                            {% endcomment %}
+                        </div>
+                        <ul id="message_list">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/tether/1.2.0/js/tether.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.4/js/bootstrap.min.js"></script>
+<script>
+var path = "{{ request.path }}";
+var socket = new WebSocket("ws://" + window.location.host + path);
+socket.onmessage = function(e) {
+    $('#message_list').prepend('<li>' + e.data + '</li>');
+}
+socket.onopen = function() {
+    socket.send("hello world");
+}
+$(function() {
+    $('#message').keypress(function(e) {
+        if ( e.which == 13 ) {
+            e.preventDefault();
+            socket.send($(this).val());
+            $(this).val('');
+        }
+    });
+});
+</script>
+
+</html>
+
